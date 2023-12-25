@@ -11,12 +11,13 @@ public class DKA
     string currentState = "q0";
     string finalState = "q0";
     TextMeshProUGUI text;
-    public DKA(Dictionary<string, List<(char, string)>> rules, string word, string finalState, TextMeshProUGUI text)
+    public DKA(Dictionary<string, List<(char, string)>> rules, string word, string finalState, string startState, TextMeshProUGUI text)
     {
         this.rules = rules;
         this.word = word;
         this.finalState = finalState;
         this.text = text;
+        currentState = startState;
     }
     public void ÑheckWord()
     {

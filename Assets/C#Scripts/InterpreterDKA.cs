@@ -14,6 +14,7 @@ public class InterpreterDKA
 
     public Dictionary<string, List<(char, string)>> rules = new Dictionary<string, List<(char, string)>>();
     private string finalState = "q0";
+    private string startState = "q0";
     TextMeshProUGUI text;
     public InterpreterDKA(List<char> alphabet, string finalSubchain, char countSymbol, int count, TextMeshProUGUI text)
     {
@@ -29,7 +30,7 @@ public class InterpreterDKA
         DKAGenerator dkaGenerator = new DKAGenerator(alphabet, finalSubchain, countSymbol, count);
         var result = dkaGenerator.GenerateDKA();
 
-        Console.WriteLine("\nTransitions:");
+        Debug.Log("\nTransitions:");
         foreach (var transition in result.Item1)
         {
             Console.Write($"{transition.Key}: ");
@@ -39,15 +40,17 @@ public class InterpreterDKA
                 Console.Write($"({pair.Key}, {pair.Value}) ");
                 transitions.Add((pair.Key, pair.Value));
             }
-            Console.WriteLine();
+            Debug.Log("");
             rules.Add(transition.Key, transitions);
         }
-        Console.WriteLine($"\nFinal State: {result.Item2}\n");
+        Debug.Log($"\nStart State: {result.Item3}\n");
+        Debug.Log($"\nFinal State: {result.Item2}\n");
+        startState = result.Item3;
         finalState = result.Item2;
     }
     public void CheckDKA(string str)
     {
-        DKA dka = new DKA(rules, str, finalState, text);
+        DKA dka = new DKA(rules, str, finalState, startState, text);
 
         dka.ÑheckWord();
     }

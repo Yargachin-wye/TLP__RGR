@@ -7,6 +7,7 @@ using UnityEngine;
 public class DKAGenerator
 {
     private List<char> alphabet;
+    private string startSubchain;
     private string finalSubchain;
     private char countSymbol;
     private int count;
@@ -21,9 +22,9 @@ public class DKAGenerator
         this.countOfCountSymbol = 0;
     }
 
-    public Tuple<Dictionary<string, Dictionary<char, string>>, string> GenerateDKA()
+    public Tuple<Dictionary<string, Dictionary<char, string>>, string, string> GenerateDKA()
     {
-        Console.WriteLine("\n\n### Generate START ###\n");
+        Debug.Log("\n\n### Generate START ###\n");
 
         List<string> states = new List<string> { "q0" };
         Dictionary<string, Dictionary<char, string>> transitions = new Dictionary<string, Dictionary<char, string>> { { "q0", new Dictionary<char, string>() } };
@@ -34,6 +35,9 @@ public class DKAGenerator
         Dictionary<string, int> counter = new Dictionary<string, int>();
         int nowCount = this.count;
         this.countOfCountSymbol = this.finalSubchain.Split(this.countSymbol).Length - 1;
+
+        startSubchain = "q0";
+
 
         int ifSubLess = 0;
         int neededWeight;
@@ -48,12 +52,12 @@ public class DKAGenerator
             {
                 var difference = this.countOfCountSymbol - this.count;
                 neededWeight = this.countOfCountSymbol + difference;
-                Console.WriteLine(neededWeight);
+                Debug.Log(neededWeight);
                 while (neededWeight % this.count != 0)
                 {
                     ifSubLess += 1;
                     neededWeight += 1;
-                    Console.WriteLine(difference + " " + neededWeight + " " + ifSubLess);
+                    Debug.Log(difference + " " + neededWeight + " " + ifSubLess);
                 }
             }
             else
@@ -62,7 +66,7 @@ public class DKAGenerator
             }
         }
         // del>
-        Console.WriteLine("\n- 1st transf -\n");
+        Debug.Log("\n- 1st transf -\n");
 
         if (this.count == 1)
         {
@@ -117,13 +121,13 @@ public class DKAGenerator
             }
         }
 
-        Console.WriteLine(currentState);
-        Console.WriteLine(nowCount);
-        Console.WriteLine(string.Join(", ", counter));
-        Console.WriteLine(string.Join(", ", transitions));
-        Console.WriteLine(string.Join(", ", states));
+        Debug.Log(currentState);
+        Debug.Log(nowCount);
+        Debug.Log(string.Join(", ", counter));
+        Debug.Log(string.Join(", ", transitions));
+        Debug.Log(string.Join(", ", states));
 
-        Console.WriteLine("\n- Other transf -\n");
+        Debug.Log("\n- Other transf -\n");
 
         if (this.count == 1)
         {
@@ -145,8 +149,10 @@ public class DKAGenerator
         }
         else if (this.countOfCountSymbol >= 1)
         {
+
             if (this.count - this.countOfCountSymbol == 0)
             {
+
                 for (int j = 0; j < this.alphabet.Count; j++)
                 {
                     char symbol = this.alphabet[j];
@@ -172,10 +178,11 @@ public class DKAGenerator
             }
         }
 
-        Console.WriteLine(string.Join(", ", transitions));
-        Console.WriteLine(currentState);
+        Debug.Log(string.Join(", ", transitions));
+        Debug.Log(currentState);
+        startSubchain = currentState;
 
-        Console.WriteLine("\n- For end sub transf -\n");
+        Debug.Log("\n- For end sub transf -\n");
 
         finalStates.Add(currentState);
 
@@ -224,14 +231,14 @@ public class DKAGenerator
             }
         }
 
-        Console.WriteLine(string.Join(", ", transitions));
-        Console.WriteLine(string.Join(", ", finalStates));
-        Console.WriteLine(nowCount);
-        Console.WriteLine(string.Join(", ", counter));
+        Debug.Log(string.Join(", ", transitions));
+        Debug.Log(string.Join(", ", finalStates));
+        Debug.Log(nowCount);
+        Debug.Log(string.Join(", ", counter));
 
         int basicStatesCount = states.Count;
 
-        Console.WriteLine("\n- From end sub transf -\n");
+        Debug.Log("\n- From end sub transf -\n");
 
         foreach (string state in finalStates)
         {
@@ -261,7 +268,7 @@ public class DKAGenerator
                         else
                         {
                             string nextState = this.SearchState(transitions, state, states, symbol, finalStates, counter, counter[state], dopStates, basicStatesCount);
-                            transitions[state][symbol] = nextState;
+                            transitions[state][symbol] = startSubchain;
                         }
                     }
                 }
@@ -290,9 +297,12 @@ public class DKAGenerator
             }
         }
 
-        Console.WriteLine("\n" + string.Join(", ", transitions));
+        Debug.Log("\n" + string.Join(", ", transitions));
 
-        return new Tuple<Dictionary<string, Dictionary<char, string>>, string>(transitions, finalStates[finalStates.Count - 1]);
+        return new Tuple<Dictionary<string, Dictionary<char, string>>, string, string>
+            (transitions,
+            finalStates[finalStates.Count - 1],
+            startSubchain);
     }
 
     private string SearchState(
